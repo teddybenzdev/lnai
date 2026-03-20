@@ -149,6 +149,9 @@ describe("claudeCodePlugin", () => {
     it("does not put mcpServers in settings.json", async () => {
       const state = createMinimalState({
         settings: {
+          permissions: {
+            allow: ["Bash(git:*)"],
+          },
           mcpServers: {
             db: { command: "npx", args: ["-y", "@example/db"] },
           },
@@ -158,11 +161,23 @@ describe("claudeCodePlugin", () => {
       const files = await claudeCodePlugin.export(state, tempDir);
 
       const settings = files.find((f) => f.path === ".claude/settings.json");
+      expect(settings).toBeDefined();
       expect(
-        (settings?.content as Record<string, unknown> | undefined)?.[
-          "mcpServers"
-        ]
+        (settings?.content as Record<string, unknown>)["mcpServers"]
       ).toBeUndefined();
+    });
+
+    it("skips .mcp.json when mcpServers is empty", async () => {
+      const state = createMinimalState({
+        settings: {
+          mcpServers: {},
+        },
+      });
+
+      const files = await claudeCodePlugin.export(state, tempDir);
+
+      const mcpJson = files.find((f) => f.path === ".mcp.json");
+      expect(mcpJson).toBeUndefined();
     });
 
     it("skips settings.json when no settings content", async () => {
@@ -179,7 +194,7 @@ describe("claudeCodePlugin", () => {
 
       const files = await claudeCodePlugin.export(state, tempDir);
 
-      // Should have CLAUDE.md, rules, skills, and settings
+      // Should have CLAUDE.md, rules, skills, settings, and .mcp.json
       expect(files.find((f) => f.path === ".claude/CLAUDE.md")).toBeDefined();
       expect(files.find((f) => f.path === ".claude/rules")).toBeDefined();
       expect(
@@ -188,6 +203,7 @@ describe("claudeCodePlugin", () => {
       expect(
         files.find((f) => f.path === ".claude/settings.json")
       ).toBeDefined();
+      expect(files.find((f) => f.path === ".mcp.json")).toBeDefined();
     });
 
     describe("file symlinks", () => {

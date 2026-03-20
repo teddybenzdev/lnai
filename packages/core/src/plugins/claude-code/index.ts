@@ -21,7 +21,8 @@ const OUTPUT_DIR = TOOL_OUTPUT_DIRS.claudeCode;
  * - .claude/CLAUDE.md (symlink -> ../.ai/AGENTS.md)
  * - .claude/rules/ (symlink -> ../.ai/rules)
  * - .claude/skills/<name>/ (symlink -> ../../.ai/skills/<name>)
- * - .claude/settings.json (generated settings merged with .ai/.claude/settings.json)
+ * - .claude/settings.json (generated permissions, merged with .ai/.claude/settings.json)
+ * - .mcp.json (generated mcpServers at project root)
  * - .claude/<path> (symlink -> ../.ai/.claude/<path>) for other override files
  */
 export const claudeCodePlugin: Plugin = {
