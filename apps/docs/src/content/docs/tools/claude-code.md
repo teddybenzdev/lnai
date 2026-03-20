@@ -14,8 +14,9 @@ LNAI exports unified configuration to Claude Code's native `.claude/` format.
 ├── CLAUDE.md          # Symlink → ../.ai/AGENTS.md
 ├── rules/             # Symlink → ../.ai/rules/
 ├── skills/<name>/     # Symlinks → ../../.ai/skills/<name>/
-├── settings.json      # Generated
+├── settings.json      # Generated (permissions)
 └── <overrides>        # Symlinks from .ai/.claude/
+.mcp.json              # Generated (mcpServers) at project root
 ```
 
 ## File Mapping
@@ -26,18 +27,30 @@ LNAI exports unified configuration to Claude Code's native `.claude/` format.
 | `.ai/rules/`         | `.claude/rules/`         | Symlink   |
 | `.ai/skills/<name>/` | `.claude/skills/<name>/` | Symlink   |
 | `.ai/settings.json`  | `.claude/settings.json`  | Generated |
+| `.ai/settings.json`  | `.mcp.json`              | Generated |
 | `.ai/.claude/<path>` | `.claude/<path>`         | Symlink   |
 
 ## Generated settings.json
 
-Settings are passed through directly in Claude format:
+Permissions are written to `.claude/settings.json`:
 
 ```json
 {
   "permissions": {
     "allow": ["Bash(git:*)"],
     "deny": ["Read(.env)"]
-  },
+  }
+}
+```
+
+To override the generated settings, place a custom `settings.json` in `.ai/.claude/`.
+
+## Generated .mcp.json
+
+MCP servers are written to `.mcp.json` at the project root (not inside `.claude/`), because Claude Code [does not read `mcpServers` from `settings.json`](https://github.com/anthropics/claude-code/issues/24477):
+
+```json
+{
   "mcpServers": {
     "memory": {
       "command": "npx",
@@ -46,5 +59,3 @@ Settings are passed through directly in Claude format:
   }
 }
 ```
-
-To override the generated settings, place a custom `settings.json` in `.ai/.claude/`.
